@@ -21,12 +21,16 @@ output=""
 
 ## Group by extensions.
 php_files=""
+js_files=""
 for f in ${files}
 do
   extension=${f##*.}
   case ${extension} in
     php)
       php_files+="${f} "
+    ;;
+    js)
+      js_files+="${f} "
     ;;
   esac
 done
@@ -36,6 +40,8 @@ done
 app_root_path=`git rev-parse --git-dir`/..
 phpcs=${app_root_path}/vendor/bin/phpcs
 phpcs_config=${app_root_path}/phpcs.xml
+eslint=${app_root_path}/node_modules/.bin/eslint
+eslint_config=${app_root_path}/.eslintrc.js
 
 ## Execute check.
 ### PHP
@@ -58,6 +64,26 @@ then
     fi
   else
     output+='\nNOTE: phpcs is not installed. php syntax checking is skipped.'
+  fi
+fi
+
+### JS
+if [ -n "${js_files}" ]
+then
+  # Check installation of eslint.
+  if [ -n "${eslint}" ] && [ -e "${eslint}" ]
+  then
+    # Check existence of cording standard file.
+    if [ ! -n "${eslint_config}" ] || [ ! -e "${eslint_config}" ]
+    then
+      output+='\nNOTE: eslint configuration file is not found.'
+      output+='\n'
+    fi
+
+    output+=`${eslint} ${js_files}`
+    is_error+=$?
+  else
+    output+='\nNOTE: eslint is not installed. js syntax checking is skipped.'
   fi
 fi
 
