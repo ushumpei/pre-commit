@@ -5,6 +5,7 @@ Check added or modified php file syntax before commit by phpcs.
 ## Installation
 
 ```sh
+$ clone this repository.
 $ cp ./pre-commit your/laravel/project/.git/hooks/pre-commit
 $ cp ./phpcs.xml your/laravel/project/phpcs.xml
 $ cd your/laravel/project
