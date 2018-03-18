@@ -1,0 +1,73 @@
+#!/bin/sh
+
+# Get against commit hash to compare.
+if git rev-parse --verify HEAD >/dev/null 2>&1
+then
+	against=HEAD
+else
+	# Initial commit: diff against an empty tree object
+	against=4b825dc642cb6eb9a060e54bf8d69288fbee4904
+fi
+
+# Redirect output to stderr.
+exec 1>&2
+
+# Get added and modified files.
+files=`git diff-index --cached --name-only --diff-filter=AM ${against}`
+
+# Check syntax.
+is_error=0
+output=""
+
+## Group by extensions.
+php_files=""
+for f in ${files}
+do
+  extension=${f##*.}
+  case ${extension} in
+    php)
+      php_files+="${f} "
+    ;;
+  esac
+done
+
+
+## Get asset paths.
+app_root_path=`git rev-parse --git-dir`/..
+phpcs=${app_root_path}/vendor/bin/phpcs
+phpcs_config=${app_root_path}/phpcs.xml
+
+## Execute check.
+### PHP
+if [ -n "${php_files}" ]
+then
+  # Check installation of phpcs.
+  if [ -n "${phpcs}" ] && [ -e "${phpcs}" ]
+  then
+    # Check existence of cording standard file.
+    if [ -n "${phpcs_config}" ] && [ -e "${phpcs_config}" ]
+    then
+      # For upgrading rule file, add -s option to display rule's name.
+      output+=`${phpcs} -s ${php_files}`
+      is_error+=$?
+    else
+      output+='\nNOTE: phpcs configuration file is not found. going to check based on psr-2'
+      output+='\n'
+      output+=`${phpcs} --standard=PSR2 ${php_files}`
+      is_error+=$?
+    fi
+  else
+    output+='\nNOTE: phpcs is not installed. php syntax checking is skipped.'
+  fi
+fi
+
+# Report if found some syntax error.
+if [ ${is_error} -gt 0 ]
+then
+  is_error=1
+  echo "${output}" | less
+else
+  is_error=0
+fi
+
+exit ${is_error}

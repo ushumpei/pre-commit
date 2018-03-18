@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<ruleset name="Custom">
+  <description>Coding standard based on PSR2 with some additions for your project.</description>
+    <!--
+      You can add your rules below.
+      For example, you can include new standard, like that;
+      <rule ref="PEAR" />
+
+      If you want to know more about phpcs,
+      See: https://github.com/squizlabs/PHP_CodeSniffer/wiki
+      See also to know the notation of this file: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-ruleset.xml
+    -->
+
+  <!-- Include the whole PSR2 standard -->
+  <rule ref="PSR2">
+    <!--
+      You can exclude specific standard by adding exclude_tag and name attribute here;
+      <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace" />
+    -->
+  </rule>
+</ruleset>
