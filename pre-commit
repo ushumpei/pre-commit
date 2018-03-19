@@ -41,17 +41,23 @@ app_root_path=`git rev-parse --git-dir`/..
 
 if [ -n `which phpcs` ]
 then
+  phpcs='phpcs'
+elif [ -e "${app_root_path}/vendor/bin/phpcs" ]
+then
   phpcs=${app_root_path}/vendor/bin/phpcs
 else
-  phpcs='phpcs'
+  phpcs='not found'
 fi
 phpcs_config=${app_root_path}/phpcs.xml
 
 if [ -n `which eslint` ]
 then
+  eslint='eslint'
+elif [ -e "${app_root_path}/node_modules/.bin/eslint" ]
+then
   eslint=${app_root_path}/node_modules/.bin/eslint
 else
-  eslint='eslint'
+  eslint='not found'
 fi
 eslint_config=${app_root_path}/.eslintrc.js
 
@@ -60,10 +66,10 @@ eslint_config=${app_root_path}/.eslintrc.js
 if [ -n "${php_files}" ]
 then
   # Check installation of phpcs.
-  if [ -n "${phpcs}" ] && [ -e "${phpcs}" ]
+  if [ "${phpcs}" != "not found" ]
   then
     # Check existence of cording standard file.
-    if [ -n "${phpcs_config}" ] && [ -e "${phpcs_config}" ]
+    if [ -e "${phpcs_config}" ]
     then
       # For upgrading rule file, add -s option to display rule's name.
       output+=`${phpcs} -s ${php_files}`
@@ -83,10 +89,10 @@ fi
 if [ -n "${js_files}" ]
 then
   # Check installation of eslint.
-  if [ -n "${eslint}" ] && [ -e "${eslint}" ]
+  if [ "${eslint}" != "not found" ]
   then
     # Check existence of cording standard file.
-    if [ ! -n "${eslint_config}" ] || [ ! -e "${eslint_config}" ]
+    if [ ! -e "${eslint_config}" ]
     then
       output+='\nNOTE: eslint configuration file is not found.'
       output+='\n'
