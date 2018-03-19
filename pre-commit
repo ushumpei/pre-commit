@@ -38,9 +38,21 @@ done
 
 ## Get asset paths.
 app_root_path=`git rev-parse --git-dir`/..
-phpcs=${app_root_path}/vendor/bin/phpcs
+
+if [ -n `which phpcs` ]
+then
+  phpcs=${app_root_path}/vendor/bin/phpcs
+else
+  phpcs='phpcs'
+fi
 phpcs_config=${app_root_path}/phpcs.xml
-eslint=${app_root_path}/node_modules/.bin/eslint
+
+if [ -n `which eslint` ]
+then
+  eslint=${app_root_path}/node_modules/.bin/eslint
+else
+  eslint='eslint'
+fi
 eslint_config=${app_root_path}/.eslintrc.js
 
 ## Execute check.
